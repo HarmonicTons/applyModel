@@ -68,6 +68,7 @@ function applyModel(data, model) {
                     subobj[prop] = map.get(prop);
                     map.set('@' + prop, subobj);
                     map.delete(prop);
+                    return;
                 }
 
                 // apply model to children
