@@ -102,7 +102,7 @@ var model = {
 
 
 // apply model to data
-applyModel(data, model);
+var formatedData = applyModel(data, model);
 
 // build XML from data
-var xml = js2xmlparser.parse("MAIN", data);
+var xml = js2xmlparser.parse("MAIN", formatedData);
