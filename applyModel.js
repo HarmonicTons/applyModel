@@ -12,9 +12,6 @@
 
 'use strict';
 
-// dependencies
-const _ = require('lodash');
-
 /**
  * Apply a model to an object
  * @param data object to modify
@@ -25,27 +22,25 @@ function applyModel(data, model) {
 
         // Apply to items of arrays
         if (model.type === "array") {
-            return _.map(data, item => applyModel(item, model.items));
+            return data.map(item => applyModel(item, model.items));
         }
 
         // Apply to properties of objects or maps
         else if (model.type === "object" && model.properties) {
 
+            // copy the source data into a map
             let map = new Map();
-            _.forEach(data, (val, key) => {
-                map.set(key, val);
-            });
-
-            // remove properties from the data that are not present in the model
-            _.forEach(map, (val, prop) => {
-                if (!model.properties.hasOwnProperty(prop)) {
-                    map.delete(prop);
+            Object.keys(data).forEach(key => {
+                // keep only the properties that are in the model
+                if (model.properties.hasOwnProperty(key)) {
+                    map.set(key, data[key]);
                 }
             });
 
             // for each property in the model
             var isOrdered = false;
-            _.forEach(model.properties, (submodel, prop) => {
+            Object.keys(model.properties).forEach(prop => {
+                let submodel = model.properties[prop];
                 //check if is ordered
                 if (submodel["export-order"]) {
                     isOrdered = true;
@@ -59,7 +54,15 @@ function applyModel(data, model) {
 
                 // create properties from the model that are missing in the data
                 if (typeof map.get(prop) === 'undefined') {
-                    map.set(prop, {});
+                    let val = {};
+                    if (submodel.type === "number") {
+                        val = 0;
+                    } else if (submodel.type === "string") {
+                        val = "";
+                    } else if (submodel.type === "array") {
+                        val = [];
+                    }
+                    map.set(prop, val);
                 }
 
                 // transform a property into an attribute
